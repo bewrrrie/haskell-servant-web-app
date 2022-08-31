@@ -4,6 +4,7 @@ dist-*
 cabal-dev
 *.o
 *.hi
+hie.yaml
 *.hie
 *.chi
 *.chs.h
