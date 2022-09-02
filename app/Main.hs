@@ -2,9 +2,9 @@
 
 module Main where
 
-import Speller
+import Grading
 
 main :: IO ()
-main = do
-  res <- spell "синхрафазатрон+в+дубне"
-  print res
+main = grade txt >>= print
+  where
+    txt = "Съешь ещё этих мяхких французских булок и выпей чАя."
