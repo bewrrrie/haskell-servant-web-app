@@ -2,12 +2,14 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Speller
+module Spelling
   ( spell
+  , countMisspellings
   ) where
 
+import Control.Monad
 import Data.Aeson
-import Data.Data (Proxy(Proxy))
+import Data.Proxy
 import qualified Data.Text as T
 import GHC.Generics (Generic)
 import Network.HTTP.Client (newManager)
@@ -28,12 +30,20 @@ data SpellResponse =
     , row :: Int
     , col :: Int
     , len :: Int
-    , word :: [Char]
-    , s :: [[Char]]
+    , word :: T.Text
+    , s :: [T.Text]
     }
   deriving (Show, Generic)
 
 instance FromJSON SpellResponse
+
+-- Misspelling data type:
+-- each value '(w,ws)' represents a misspelled word 'w'
+-- together with a list 'ws' of all its possible fixes
+type Misspelling = (T.Text, [T.Text])
+
+responseToMisspelling :: SpellResponse -> Misspelling
+responseToMisspelling r = (word r, s r)
 
 checkText :: Maybe T.Text -> ClientM [SpellResponse]
 checkText = client api
@@ -41,12 +51,15 @@ checkText = client api
     api :: Proxy SpellAPI
     api = Proxy
 
-spell :: T.Text -> IO [SpellResponse]
+spell :: T.Text -> IO [Misspelling]
 spell txt = do
   let yandexApiUrl = "https://speller.yandex.net/services/spellservice.json"
   manager' <- newManager tlsManagerSettings
   url <- parseBaseUrl yandexApiUrl
   res <- runClientM (checkText $ Just txt) (mkClientEnv manager' url)
   case res of
-    Left err -> error $ show err
-    Right response -> return response
+    Left err -> error $ "Speller: spell:" ++ show err
+    Right responses -> return $ map responseToMisspelling responses
+
+countMisspellings :: T.Text -> IO Int
+countMisspellings = return . length <=< spell
