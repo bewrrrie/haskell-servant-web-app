@@ -1,4 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
+import Speller
+
 main :: IO ()
-main = putStrLn "Hello, Servant."
+main = do
+  res <- spell "синхрафазатрон+в+дубне"
+  print res
