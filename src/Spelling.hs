@@ -3,8 +3,7 @@
 {-# LANGUAGE TypeOperators #-}
 
 module Spelling
-  ( spell
-  , countMisspellings
+  ( countMisspellings
   ) where
 
 import Control.Monad
