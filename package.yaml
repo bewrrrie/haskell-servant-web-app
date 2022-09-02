@@ -15,6 +15,10 @@ dependencies:
 - text
 - time
 - servant
+- servant-client
+- aeson
+- http-client
+- http-client-tls
 
 ghc-options:
 - -Wall
