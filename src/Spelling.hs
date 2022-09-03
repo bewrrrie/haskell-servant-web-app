@@ -17,7 +17,7 @@ import Servant.Client
 
 -- Yandex Speller API (see https://yandex.ru/dev/speller/)
 type SpellAPI
-   = "checkText" :> QueryParam "text" T.Text :> Get '[ JSON] [SpellResponse]
+   = "checkText" :> QueryParam "lang" T.Text :> QueryParam "text" T.Text :> Get '[ JSON] [SpellResponse]
 
 -- Response description
 -- (see https://yandex.ru/dev/speller/doc/dg/reference/checkText.html)
@@ -36,10 +36,11 @@ data SpellResponse =
 instance FromJSON SpellResponse
 
 checkText :: Maybe T.Text -> ClientM [SpellResponse]
-checkText = client api
+checkText = client api $ Just $ T.pack lang
   where
     api :: Proxy SpellAPI
     api = Proxy
+    lang = "ru,en"
 
 spell :: T.Text -> IO [T.Text]
 spell txt = do
