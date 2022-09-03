@@ -1,10 +1,14 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Grading
   ( grade
   , misspelled
   , score
   ) where
 
+import Data.Aeson
 import qualified Data.Text as T
+import GHC.Generics
 import Spelling
 
 data TextReview =
@@ -12,7 +16,9 @@ data TextReview =
     { misspelled :: [T.Text]
     , score :: Int
     }
-  deriving (Eq, Show)
+  deriving (Generic, Eq, Show)
+
+instance ToJSON TextReview
 
 -- | @misspellingsToGrade @n is a function which converts number 
 -- | of misspellings @n to a grade on scale from 0 to 5.
