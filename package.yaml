@@ -16,6 +16,7 @@ dependencies:
 - time
 - aeson
 - servant
+- servant-server
 - servant-client
 - http-client
 - http-client-tls
