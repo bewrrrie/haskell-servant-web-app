@@ -3,10 +3,9 @@
 {-# LANGUAGE TypeOperators #-}
 
 module Spelling
-  ( countMisspellings
+  ( spell
   ) where
 
-import Control.Monad
 import Data.Aeson
 import Data.Proxy
 import qualified Data.Text as T
@@ -36,21 +35,13 @@ data SpellResponse =
 
 instance FromJSON SpellResponse
 
--- Misspelling data type:
--- each value '(w,ws)' represents a misspelled word 'w'
--- together with a list 'ws' of all its possible fixes
-type Misspelling = (T.Text, [T.Text])
-
-responseToMisspelling :: SpellResponse -> Misspelling
-responseToMisspelling r = (word r, s r)
-
 checkText :: Maybe T.Text -> ClientM [SpellResponse]
 checkText = client api
   where
     api :: Proxy SpellAPI
     api = Proxy
 
-spell :: T.Text -> IO [Misspelling]
+spell :: T.Text -> IO [T.Text]
 spell txt = do
   let yandexApiUrl = "https://speller.yandex.net/services/spellservice.json"
   manager' <- newManager tlsManagerSettings
@@ -58,7 +49,4 @@ spell txt = do
   res <- runClientM (checkText $ Just txt) (mkClientEnv manager' url)
   case res of
     Left err -> error $ "Speller: spell:" ++ show err
-    Right responses -> return $ map responseToMisspelling responses
-
-countMisspellings :: T.Text -> IO Int
-countMisspellings = return . length <=< spell
+    Right responses -> return $ map word responses
