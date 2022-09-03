@@ -4,6 +4,7 @@ module Grading
   ( grade
   , misspelled
   , score
+  , TextReview
   ) where
 
 import Data.Aeson
