@@ -6,17 +6,17 @@ module App
   ) where
 
 import Control.Monad.Trans
-import Data.Maybe
 import qualified Data.Text as T
 import Grading
 import qualified Network.Wai.Handler.Warp as W
 import Servant
 
 type TextReviewAPI
-   = "check" :> QueryParam "text" T.Text :> Post '[ JSON] TextReview
+   = "check" :> QueryParam "text" T.Text :> Get '[ JSON] TextReview
 
 server :: Server TextReviewAPI
-server = liftIO . grade . fromJust
+server Nothing = throwError err404
+server (Just txt) = liftIO $ grade txt
 
 textReviewAPI :: Proxy TextReviewAPI
 textReviewAPI = Proxy
