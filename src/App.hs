@@ -12,7 +12,7 @@ import qualified Network.Wai.Handler.Warp as W
 import Servant
 
 type TextReviewAPI
-   = "check" :> QueryParam "text" T.Text :> Get '[ JSON] TextReview
+   = "submit" :> QueryParam "text" T.Text :> Post '[ JSON] TextReview
 
 server :: Server TextReviewAPI
 server Nothing = throwError err404
