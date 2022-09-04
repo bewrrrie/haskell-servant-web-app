@@ -2,9 +2,7 @@
 
 module Main where
 
-import Grading
+import App
 
 main :: IO ()
-main = grade txt >>= print
-  where
-    txt = "Съешь ещё этих мяхких французских булок и выпей чАя."
+main = run 8081
