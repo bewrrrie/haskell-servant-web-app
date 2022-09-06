@@ -10,12 +10,13 @@ module Grading
 import Data.Aeson
 import qualified Data.Text as T
 import GHC.Generics
+import GHC.Int
 import Spelling
 
 data TextReview =
   TextReview
     { misspelled :: [T.Text]
-    , score :: Int
+    , score :: Int16
     }
   deriving (Generic, Eq, Show)
 
@@ -34,11 +35,11 @@ instance ToJSON TextReview
 -- 5
 -- >>> misspellingsToGrade 100
 -- 0
-misspellingsToGrade :: Int -> Int
+misspellingsToGrade :: Int -> Int16
 misspellingsToGrade n
   | n < 0 = 5
   | n > 5 = 0
-  | otherwise = 5 - n
+  | otherwise = 5 - fromIntegral n
 
 grade :: T.Text -> IO TextReview
 grade txt = misspelledWords >>= k
