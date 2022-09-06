@@ -1,7 +1,10 @@
-CREATE DATABASE appdb;
-
-\connect appdb
-
+/*
+Table of students submissions. Each row contains
+- timestamp representing a time of submission;
+- name of a student;
+- text sent by a student;
+- grade for a text written by a student.
+*/
 CREATE TABLE submissions (
   id INT NOT NULL PRIMARY KEY,
   datetime TIMESTAMP NOT NULL,
