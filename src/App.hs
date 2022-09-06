@@ -7,17 +7,21 @@ module App
   ) where
 
 import Control.Monad.Trans
+
 import Data.Aeson
 import qualified Data.Text as T
+
 import GHC.Generics (Generic)
 import Grading
+import Hasql.Connection (Connection)
 import qualified Network.Wai.Handler.Warp as W
 import Servant
+import SubmissionsDB
 
 data SubmitInfo =
   SubmitInfo
-    { text :: T.Text
-    , userId :: T.Text
+    { userName :: T.Text
+    , text :: T.Text
     }
   deriving (Generic, Show, Eq)
 
@@ -28,17 +32,22 @@ instance FromJSON SubmitInfo
 type TextReviewAPI
    = "submit" :> ReqBody '[ JSON] SubmitInfo :> Post '[ JSON] TextReview
 
-server :: Server TextReviewAPI
-server body = liftIO $ grade txt
-  where
-    txt = text body
-    uid = userId body
+getServer :: Connection -> Server TextReviewAPI
+getServer conn body =
+  let txt = text body
+      name = userName body
+   in liftIO $ do
+        gr <- grade txt
+        addSubmission conn name txt (score gr)
+        return gr
 
 textReviewAPI :: Proxy TextReviewAPI
 textReviewAPI = Proxy
 
-app :: Application
-app = serve textReviewAPI server
+app :: Connection -> Application
+app conn = serve textReviewAPI server
+  where
+    server = getServer conn
 
-run :: Int -> IO ()
-run port = W.run port app
+run :: Connection -> Int -> IO ()
+run conn port = W.run port (app conn)
