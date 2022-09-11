@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 
 module Grading
   ( grade
@@ -18,9 +19,7 @@ data TextReview =
     { misspelled :: [T.Text]
     , score :: Int16
     }
-  deriving (Generic, Eq, Show)
-
-instance ToJSON TextReview
+  deriving (Generic, Eq, Show, ToJSON)
 
 -- | @misspellingsToGrade @n is a function which converts number 
 -- | of misspellings @n to a grade on scale from 0 to 5.

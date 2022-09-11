@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass #-}
 
 module Spelling
   ( spell
@@ -31,9 +32,7 @@ data SpellResponse =
     , word :: T.Text
     , s :: [T.Text]
     }
-  deriving (Show, Generic)
-
-instance FromJSON SpellResponse
+  deriving (Show, Generic, FromJSON)
 
 checkText :: Maybe T.Text -> ClientM [SpellResponse]
 checkText = client api $ Just $ T.pack lang

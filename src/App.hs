@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DeriveAnyClass #-}
 
 module App
   ( run
@@ -23,11 +24,7 @@ data SubmitInfo =
     { userName :: T.Text
     , text :: T.Text
     }
-  deriving (Generic, Show, Eq)
-
-instance ToJSON SubmitInfo
-
-instance FromJSON SubmitInfo
+  deriving (Generic, Show, Eq, ToJSON, FromJSON)
 
 type TextReviewAPI
    = "submit" :> ReqBody '[ JSON] SubmitInfo :> Post '[ JSON] TextReview
