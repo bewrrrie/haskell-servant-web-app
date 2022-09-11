@@ -59,8 +59,7 @@ misspellingsToGrade n
 -- >>> grade $ T.pack "Don't do this!"
 -- TextReview {misspelled = [], score = 5}
 grade :: T.Text -> IO TextReview
-grade txt = misspelledWords >>= k
+grade txt = toReview <$> misspelledWords
   where
     misspelledWords = spell txt
-    k = return . toReview
     toReview ws = TextReview ws $ misspellingsToGrade $ length ws
