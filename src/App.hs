@@ -21,8 +21,8 @@ import SubmissionsDB
 
 data SubmitInfo =
   SubmitInfo
-    { userName :: T.Text
-    , text :: T.Text
+    { userName :: !T.Text
+    , text :: !T.Text
     }
   deriving (Generic, Show, Eq, ToJSON, FromJSON)
 

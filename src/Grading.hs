@@ -16,8 +16,8 @@ import Spelling
 
 data TextReview =
   TextReview
-    { misspelled :: [T.Text]
-    , score :: Int16
+    { misspelled :: ![T.Text]
+    , score :: !Int16
     }
   deriving (Generic, Eq, Show, ToJSON)
 

@@ -24,13 +24,13 @@ type SpellAPI
 -- (see https://yandex.ru/dev/speller/doc/dg/reference/checkText.html)
 data SpellResponse =
   SpellResponse
-    { code :: Int
-    , pos :: Int
-    , row :: Int
-    , col :: Int
-    , len :: Int
-    , word :: T.Text
-    , s :: [T.Text]
+    { code :: !Int
+    , pos :: !Int
+    , row :: !Int
+    , col :: !Int
+    , len :: !Int
+    , word :: !T.Text
+    , s :: ![T.Text]
     }
   deriving (Show, Generic, FromJSON)
 
