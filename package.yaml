@@ -17,6 +17,7 @@ dependencies:
 - text
 - time
 - aeson
+- optparse-applicative
 - servant
 - servant-server
 - servant-client
