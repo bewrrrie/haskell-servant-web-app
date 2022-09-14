@@ -1,10 +1,24 @@
 module Main where
 
-import App
+import App (run)
 import Data.ByteString as B
 import GHC.Word (Word16)
 import Hasql.Connection (release)
 import Options.Applicative
+  ( Parser
+  , ParserInfo
+  , (<**>)
+  , argument
+  , auto
+  , execParser
+  , fullDesc
+  , header
+  , helper
+  , info
+  , metavar
+  , progDesc
+  , str
+  )
 import SubmissionsDB (connectToDB, initDB)
 
 data Options =

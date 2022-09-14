@@ -7,17 +7,26 @@ module App
   ( run
   ) where
 
-import Control.Monad.Trans
+import Control.Monad.Trans (liftIO)
 
-import Data.Aeson
+import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Text as T
 
 import GHC.Generics (Generic)
-import Grading
+import Grading (TextReview, grade, score)
 import Hasql.Connection (Connection)
 import qualified Network.Wai.Handler.Warp as W
 import Servant
-import SubmissionsDB
+  ( (:>)
+  , Application
+  , JSON
+  , Post
+  , Proxy(Proxy)
+  , ReqBody
+  , Server
+  , serve
+  )
+import SubmissionsDB (addSubmission)
 
 data SubmitInfo =
   SubmitInfo

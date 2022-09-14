@@ -7,14 +7,14 @@ module Spelling
   ( spell
   ) where
 
-import Data.Aeson
-import Data.Proxy
+import Data.Aeson (FromJSON)
+import Data.Proxy (Proxy(Proxy))
 import qualified Data.Text as T
 import GHC.Generics (Generic)
 import Network.HTTP.Client (newManager)
 import Network.HTTP.Client.TLS (tlsManagerSettings)
-import Servant.API
-import Servant.Client
+import Servant.API ((:>), Get, JSON, QueryParam)
+import Servant.Client (ClientM, client, mkClientEnv, parseBaseUrl, runClientM)
 
 -- Yandex Speller API (see https://yandex.ru/dev/speller/)
 type SpellAPI

@@ -8,11 +8,11 @@ module Grading
   , TextReview
   ) where
 
-import Data.Aeson
+import Data.Aeson (ToJSON)
 import qualified Data.Text as T
-import GHC.Generics
-import GHC.Int
-import Spelling
+import GHC.Generics (Generic)
+import GHC.Int (Int16)
+import Spelling (spell)
 
 data TextReview =
   TextReview

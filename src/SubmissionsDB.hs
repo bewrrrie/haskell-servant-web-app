@@ -7,17 +7,17 @@ module SubmissionsDB
   , addSubmission
   ) where
 
-import Contravariant.Extras.Contrazip
+import Contravariant.Extras.Contrazip (contrazip4)
 import Data.ByteString.Char8 as C
 import qualified Data.Text as T
-import Data.Time.LocalTime
-import GHC.Int
-import GHC.Word
-import Hasql.Connection
+import Data.Time.LocalTime (LocalTime, getZonedTime, zonedTimeToLocalTime)
+import GHC.Int (Int16)
+import GHC.Word (Word16)
+import Hasql.Connection (Connection, acquire, settings)
 import qualified Hasql.Decoders as D
 import qualified Hasql.Encoders as E
 import Hasql.Session (Session, run, statement)
-import Hasql.Statement
+import Hasql.Statement (Statement(Statement))
 
 connectToDB ::
      C.ByteString -> Word16 -> C.ByteString -> C.ByteString -> IO Connection
