@@ -26,6 +26,7 @@ dependencies:
 - warp
 - mtl
 - hasql
+- hasql-pool
 
 ghc-options:
 - -Wall

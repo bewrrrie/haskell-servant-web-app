@@ -14,7 +14,7 @@ import qualified Data.Text as T
 
 import GHC.Generics (Generic)
 import Grading (TextReview, grade, score)
-import Hasql.Connection (Connection)
+import Hasql.Pool (Pool)
 import qualified Network.Wai.Handler.Warp as W
 import Servant
   ( (:>)
@@ -38,22 +38,22 @@ data SubmitInfo =
 type TextReviewAPI
    = "submit" :> ReqBody '[ JSON] SubmitInfo :> Post '[ JSON] TextReview
 
-getServer :: Connection -> Server TextReviewAPI
-getServer conn body =
+getServer :: Pool -> Server TextReviewAPI
+getServer pool body =
   let txt = text body
       name = userName body
    in liftIO $ do
         gr <- grade txt
-        addSubmission conn name txt (score gr)
+        addSubmission pool name txt (score gr)
         return gr
 
 textReviewAPI :: Proxy TextReviewAPI
 textReviewAPI = Proxy
 
-app :: Connection -> Application
-app conn = serve textReviewAPI server
+app :: Pool -> Application
+app pool = serve textReviewAPI server
   where
-    server = getServer conn
+    server = getServer pool
 
-run :: Connection -> Int -> IO ()
-run conn port = W.run port (app conn)
+run :: Pool -> Int -> IO ()
+run pool port = W.run port (app pool)

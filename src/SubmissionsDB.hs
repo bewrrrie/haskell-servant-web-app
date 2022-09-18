@@ -5,6 +5,7 @@ module SubmissionsDB
   , initDB
   , runSession
   , addSubmission
+  , ConnInfo(..)
   ) where
 
 import Contravariant.Extras.Contrazip (contrazip4)
@@ -13,21 +14,29 @@ import qualified Data.Text as T
 import Data.Time.LocalTime (LocalTime, getZonedTime, zonedTimeToLocalTime)
 import GHC.Int (Int16)
 import GHC.Word (Word16)
-import Hasql.Connection (Connection, acquire, settings)
+import Hasql.Connection (settings)
 import qualified Hasql.Decoders as D
 import qualified Hasql.Encoders as E
-import Hasql.Session (Session, run, statement)
+import Hasql.Pool (Pool, acquire, use)
+import Hasql.Session (Session, statement)
 import Hasql.Statement (Statement(Statement))
 
-connectToDB ::
-     C.ByteString -> Word16 -> C.ByteString -> C.ByteString -> IO Connection
-connectToDB url port user pass = do
-  let connSettings = settings url port user pass ""
-  connResult <- acquire connSettings
-  case connResult of
-    Left (Just errMsg) -> error $ C.unpack errMsg
-    Left Nothing -> error "Unspecified connection error!"
-    Right connection -> return connection
+data ConnInfo =
+  ConnInfo
+    { poolSize :: !Int
+    , timeout :: !Int
+    , host :: !C.ByteString
+    , port :: !Word16
+    , user :: !C.ByteString
+    , pass :: !C.ByteString
+    }
+
+connectToDB :: ConnInfo -> IO Pool
+connectToDB (ConnInfo _poolSize _timeout _host _port _user _pass) =
+  acquire (_poolSize, toEnum $ toSeconds _timeout, connSettings)
+  where
+    toSeconds = (* 1000000000000)
+    connSettings = settings _host _port _user _pass ""
 
 createSubbmissionsTableStatement :: Statement () ()
 createSubbmissionsTableStatement =
@@ -42,12 +51,12 @@ createSubbmissionsTableStatement =
       decoder = D.noResult
    in Statement sql encoder decoder True
 
-initDB :: Connection -> IO ()
-initDB conn = runSession conn $ statement () createSubbmissionsTableStatement
+initDB :: Pool -> IO ()
+initDB pool = runSession pool $ statement () createSubbmissionsTableStatement
 
-runSession :: Connection -> Session a -> IO a
-runSession conn session = do
-  sessionResult <- run session conn
+runSession :: Pool -> Session a -> IO a
+runSession pool session = do
+  sessionResult <- use pool session
   case sessionResult of
     Right result -> return result
     Left err -> error $ show err
@@ -66,9 +75,9 @@ insertSubmissionStatement =
       decoder = D.noResult
    in Statement sql encoder decoder True
 
-addSubmission :: Connection -> T.Text -> T.Text -> Int16 -> IO ()
-addSubmission conn name txt score = do
+addSubmission :: Pool -> T.Text -> T.Text -> Int16 -> IO ()
+addSubmission pool name txt score = do
   zonedTimestamp <- getZonedTime
   let localTimestamp = zonedTimeToLocalTime zonedTimestamp
-  runSession conn $
+  runSession pool $
     statement (localTimestamp, name, txt, score) insertSubmissionStatement

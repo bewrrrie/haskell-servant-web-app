@@ -1,9 +1,7 @@
 module Main where
 
 import App (run)
-import Data.ByteString as B
-import GHC.Word (Word16)
-import Hasql.Connection (release)
+import Hasql.Pool (release)
 import Options.Applicative
   ( Parser
   , ParserInfo
@@ -19,36 +17,33 @@ import Options.Applicative
   , progDesc
   , str
   )
-import SubmissionsDB (connectToDB, initDB)
+import SubmissionsDB (ConnInfo(ConnInfo), connectToDB, initDB)
 
 data Options =
   Options
     { port :: String
-    , urlDB :: B.ByteString
-    , portDB :: Word16
-    , userDB :: B.ByteString
-    , passDB :: B.ByteString
+    , connInfo :: ConnInfo
     }
 
 main :: IO ()
 main = do
-  Options { port = _port
-          , urlDB = _urlDB
-          , portDB = _portDB
-          , userDB = _userDB
-          , passDB = _passDB
-          } <- execParser parserInfo
-  connection <- connectToDB _urlDB _portDB _userDB _passDB
-  initDB connection
-  run connection $ read _port
-  release connection
+  Options {port = _port, connInfo = _connInfo} <- execParser parserInfo
+  pool <- connectToDB _connInfo
+  initDB pool
+  run pool $ read _port
+  release pool
 
 parser :: Parser Options
 parser =
-  Options <$> portOpt <*> urlDbOpt <*> portDbOpt <*> userDbOpt <*> passDbOpt
+  Options <$> portOpt <*>
+  (ConnInfo <$> poolSizeOpt <*> timeoutOpt <*> hostDbOpt <*> portDbOpt <*>
+   userDbOpt <*>
+   passDbOpt)
   where
     portOpt = argument str (metavar "PORT")
-    urlDbOpt = argument str (metavar "URL_DB")
+    poolSizeOpt = argument auto (metavar "POOL_SIZE")
+    timeoutOpt = argument auto (metavar "TIMEOUT")
+    hostDbOpt = argument str (metavar "URL_DB")
     portDbOpt = argument auto (metavar "PORT_DB")
     userDbOpt = argument str (metavar "USER_DB")
     passDbOpt = argument str (metavar "PASS_DB")
